@@ -6,22 +6,6 @@
     cache_valid_time: 3600
   become: true
 
-- name: ssh-client
-  block:
-    - name: Ensure directory exists
-      file:
-        path: "{{ ansible_env.HOME }}/.ssh"
-        state: directory
-        mode: "0700"
-    - name: SSH generic config
-      blockinfile:
-        path: "{{ ansible_user_dir }}/.ssh/config"
-        marker: "# {mark} Generic config managed by Ansible"
-        block: |
-          AddKeysToAgent yes
-          ForwardAgent yes
-          StrictHostKeyChecking accept-new
-
 - name: Set up editor
   block:
     - name: install neovim

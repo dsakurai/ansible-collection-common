@@ -21,5 +21,23 @@
       [Install]
       WantedBy=default.target
 
-- name: Reload systemd user daemon
-  command: systemctl --user daemon-reload
+- name: Add env var
+  blockinfile:
+    path: "{{ ansible_user_dir }}/.bashrc"
+    marker: "# {mark} SSH-Agent config managed by Ansible."
+    block: |
+      export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+    create: true
+
+- name: systemd
+  block:
+  - name: Reload systemd user daemon
+    command: systemctl --user daemon-reload
+
+  - name: Start systemd service
+    systemd:
+      name: ssh-agent-user.service
+      masked: no
+      enabled: yes
+      state: started
+      scope: user
