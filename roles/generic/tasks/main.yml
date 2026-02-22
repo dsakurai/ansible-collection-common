@@ -1,0 +1,26 @@
+---
+- name: Update and upgrade
+  apt:
+    upgrade: full
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Set up editor
+  block:
+    - name: install neovim
+      apt:
+        name: neovim
+      become: true
+
+    - name: Set editor
+      shell: update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 100
+      become: true
+
+    - name: Set editor env var
+      become: true
+      copy:
+        content: |
+          export EDITOR="/usr/bin/nvim"
+        dest: /etc/profile.d/editor.sh
+

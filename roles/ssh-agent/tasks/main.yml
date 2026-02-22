@@ -1,0 +1,43 @@
+---
+- name: Ensure directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: "0700"
+
+- name: Auto-start SSH-Agent
+  copy:
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/ssh-agent-user.service"
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=SSH key agent
+
+      [Service]
+      Type=simple
+      Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
+      ExecStart=/usr/bin/ssh-agent -D -a $SSH_AUTH_SOCK
+
+      [Install]
+      WantedBy=default.target
+
+- name: Add env var
+  blockinfile:
+    path: "{{ ansible_user_dir }}/.bashrc"
+    marker: "# {mark} SSH-Agent config managed by Ansible."
+    block: |
+      export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+    create: true
+
+- name: systemd
+  block:
+  - name: Reload systemd user daemon
+    command: systemctl --user daemon-reload
+
+  - name: Start systemd service
+    systemd:
+      name: ssh-agent-user.service
+      masked: no
+      enabled: yes
+      state: started
+      scope: user

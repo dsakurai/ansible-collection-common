@@ -1,0 +1,15 @@
+---
+- name: Ensure directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: "0700"
+- name: SSH generic config
+  blockinfile:
+    path: "{{ ansible_user_dir }}/.ssh/config"
+    marker: "# {mark} Generic config managed by Ansible"
+    block: |
+      AddKeysToAgent yes
+      ForwardAgent yes
+      StrictHostKeyChecking accept-new
+    create: true
