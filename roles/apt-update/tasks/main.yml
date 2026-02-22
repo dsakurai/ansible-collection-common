@@ -1,5 +1,5 @@
 ---
-- name: Update and upgrade
+- name: Update apt cache
   apt:
     update_cache: true
     cache_valid_time: 3600
