@@ -1,4 +1,5 @@
 ---
+# We install Cargo without apt because Debian's handling of cargo is different from the standard Rust management.
 - name: Cargo
   vars:
     rustup_bin: "~/.cargo/bin/rustup"
@@ -18,4 +19,7 @@
       ansible.builtin.lineinfile:
         path: ~/.bashrc
         line:    'export PATH="${HOME}/.cargo/bin:${PATH}"'
+    - name: Pass cargo to other tasks
+      set_fact:
+        cargo_binary: "{{ ansible_env.HOME }}/.cargo/bin/cargo"
 

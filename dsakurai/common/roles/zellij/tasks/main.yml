@@ -1,14 +1,12 @@
 ---
 - name: zellij
   block:
-    - name: Update toolchain
-      command: "rust update stable"
 
     - name: Install latest Zellij
       community.general.cargo:
         name: zellij
         state: latest
-        # executable: "~/.cargo/bin/cargo"
+        executable: "{{ cargo_binary }}"
       environment:
         OPENSSL_NO_VENDOR: "1" # force link to system libssl
 
