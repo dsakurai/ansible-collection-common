@@ -7,7 +7,7 @@
 
 - name: Auto-start SSH-Agent
   copy:
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/user-ssh-agent.service"
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/ssh-agent-user.service"
     mode: "0644"
     content: |
       [Unit]
