@@ -6,36 +6,8 @@
     cache_valid_time: 3600
   become: true
 
-- name: ssh
+- name: ssh-client
   block:
-    - name: ssh-agent
-      tags: ["ssh-agent", "never"]
-      block:
-        - name: Ensure directory exists
-          file:
-            path: "{{ ansible_env.HOME }}/.config/systemd/user"
-            state: directory
-            mode: "0700"
-
-        - name: Auto-start SSH-Agent
-          copy:
-            dest: "{{ ansible_env.HOME }}/.config/systemd/user/user-ssh-agent.service"
-            mode: "0644"
-            content: |
-              [Unit]
-              Description=SSH key agent
-
-              [Service]
-              Type=simple
-              Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
-              ExecStart=/usr/bin/ssh-agent -D -a $SSH_AUTH_SOCK
-
-              [Install]
-              WantedBy=default.target
-
-        - name: Reload systemd user daemon
-          command: systemctl --user daemon-reload
-
     - name: SSH generic config
       blockinfile:
         path: "{{ ansible_user_dir }}/.ssh/config"
