@@ -2,6 +2,11 @@
 - name: zellij
   block:
 
+    - name: Install dependencies
+      become: true
+      apt:
+        name: ["build-essential"]
+
     - name: Install latest Zellij
       community.general.cargo:
         name: zellij
