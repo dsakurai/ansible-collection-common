@@ -5,7 +5,11 @@
     - name: Install dependencies
       become: true
       apt:
-        name: ["build-essential"]
+        name:
+          - build-essential
+          - pkg-config
+          - libssl-dev
+          - perl             # For vendoring OpenSSL
 
     - name: Install latest Zellij
       community.general.cargo:
