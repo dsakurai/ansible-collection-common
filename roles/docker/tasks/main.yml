@@ -1,0 +1,12 @@
+---
+- name: install docker
+  apt:
+    name: ["docker.io", "docker-compose-v2"]
+  become: true
+- name: Add the user to docker group.
+  become: true
+  user:
+    name: "{{ lookup('env','USER') }}"
+    groups: docker
+    append: yes
+
