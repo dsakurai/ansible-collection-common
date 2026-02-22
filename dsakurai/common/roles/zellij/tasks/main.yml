@@ -1,0 +1,26 @@
+---
+- name: zellij
+  block:
+
+    - name: Install dependencies
+      become: true
+      apt:
+        name:
+          - build-essential
+          - pkg-config
+          - libssl-dev
+          - perl             # For vendoring OpenSSL
+
+    - name: Install latest Zellij
+      community.general.cargo:
+        name: zellij
+        state: latest
+        executable: "{{ cargo_binary }}"
+      environment:
+        OPENSSL_NO_VENDOR: "1" # force link to system libssl
+
+    - name: Apply theme
+      ansible.builtin.lineinfile:
+        path: "~/.config/zellij/config.kdl"
+        line: theme "catppuccin-latte"
+        create: true
