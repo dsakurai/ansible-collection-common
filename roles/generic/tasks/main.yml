@@ -1,11 +1,4 @@
 ---
-- name: Update and upgrade
-  apt:
-    upgrade: full
-    update_cache: true
-    cache_valid_time: 3600
-  become: true
-
 - name: Set up editor
   block:
     - name: install neovim
@@ -23,4 +16,85 @@
         content: |
           export EDITOR="/usr/bin/nvim"
         dest: /etc/profile.d/editor.sh
+    - name: Deploy init.lua for Neovim
+      tags: neovim
+      blockinfile:
+        dest: "{{ lookup('env','HOME') }}/.config/nvim/init.lua"
+        create: true
+        marker: -- {mark} Managed by Ansible --
+        content: |
+          -- Press Shift+Tab to deindent
+          vim.keymap.set("i", "<S-Tab>", "<C-d>")
+          vim.keymap.set("n", "<S-Tab>", "<<")
+          vim.keymap.set("v", "<S-Tab>", "<gv")
+
+- name: git
+  block:
+    ###
+    # git should be already installed for DL-ing this Ansible project.
+    # In fact, installing OS git might conflict with git from VSCode, etc.
+    #
+    # - name: install git
+    #   apt:
+    #     name: git
+    #   become: true
+    - name: git set up
+      shell: git config --global init.defaultBranch main
+    - name: git alias
+      git_config:
+        scope: global
+        name: alias.log-graph
+        value: log --graph
+
+
+- name: Cycle bash completion with TAB
+  blockinfile:
+    block: |
+      set editing-mode vi
+
+      set keymap vi-command
+      "\C-l": clear-screen
+
+      set keymap vi-insert
+      "\C-l": clear-screen
+      TAB: menu-complete
+      "\e[Z": menu-complete-backward
+      set show-all-if-ambiguous on
+      set menu-complete-display-prefix on
+    dest: ~/.inputrc
+    create: true
+
+
+- name: Install basic stuff
+  apt:
+    name:
+      - bash-completion
+      - tree
+  become: true
+
+- name: Install ranger
+  block:
+    - name: Install ranger with apt
+      apt:
+        name: ranger
+      become: true
+
+    - name: ensure rifle.conf exists
+      tags: rifle
+      command:
+        cmd: ranger --copy-config=rifle
+        creates: "~/.config/ranger/rifle.conf"
+
+    - name: open yml / yaml in nvim
+      tags: ranger
+      blockinfile:
+        path: "~/.config/ranger/rifle.conf"
+        insertbefore: BOF
+        block: |
+
+          # Prefer $EDITOR/$VISUAL for YAML and patch files.
+          # Matches .yml, .yaml and .patch; placed before generic/xdg-open rules.
+          ext ya?ml|patch, label editor = ${VISUAL:-$EDITOR} -- "$@"
+          ext ya?ml|patch, label pager  = ${PAGER:-less} -- "$@"
+
 

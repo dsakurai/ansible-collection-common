@@ -1,0 +1,11 @@
+---
+- name: Warning
+  debug:
+    msg: If podman compose shows WARNING, run `sudo mount --make-rshared /`
+# - name: make shared
+#   become: true
+#   blockinfile:
+#     path: /etc/wsl.conf
+#     block: |
+#       command="mount --make-rshared /"
+
