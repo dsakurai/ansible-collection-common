@@ -9,7 +9,5 @@
     path: "{{ ansible_user_dir }}/.ssh/config"
     marker: "# {mark} Generic config managed by Ansible"
     block: |
-      AddKeysToAgent yes
-      ForwardAgent yes
       StrictHostKeyChecking accept-new
     create: true

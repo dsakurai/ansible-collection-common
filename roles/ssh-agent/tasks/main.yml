@@ -21,13 +21,25 @@
       [Install]
       WantedBy=default.target
 
-- name: Add env var
-  blockinfile:
-    path: "{{ ansible_user_dir }}/.bashrc"
-    marker: "# {mark} SSH-Agent config managed by Ansible."
-    block: |
-      export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
-    create: true
+- name: Socket config
+  block:
+    - name: SSH config
+      blockinfile:
+        path: "{{ ansible_user_dir }}/.ssh/config"
+        marker: "# {mark} ssh-agent config managed by Ansible"
+        block: |
+          AddKeysToAgent yes
+          ForwardAgent yes
+          IdentityAgent {{ ansible_env.XDG_RUNTIME_DIR }}/ssh-agent.socket
+        create: true
+
+    # - name: Add env var
+    #   blockinfile:
+    #     path: "{{ ansible_user_dir }}/.bashrc"
+    #     marker: "# {mark} SSH-Agent config managed by Ansible."
+    #     block: |
+    #       export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+    #     create: true
 
 - name: systemd
   block:
