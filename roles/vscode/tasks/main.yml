@@ -113,8 +113,20 @@
             "delete",
             "v"
         ],
-        "vscode-neovim.neovimExecutablePaths.darwin": "",
-        "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
+        "workbench.settings.applyToAllProfiles": [
+            "dotfiles.repository"
+        ],
+        "editor.autoIndentOnPaste": true,
+        "editor.autoIndentOnPasteWithinString": false,
+        "terminal.integrated.commandsToSkipShell": [
+          "-workbench.action.quickOpen"
+        ],
+        "terminal.integrated.stickyScroll.enabled": false,
+        "[latex]": {
+            "editor.wordBasedSuggestions": "off",
+            "editor.snippetSuggestions": "none",
+            "editor.foldingStrategy": "indentation",
+        },
         "vscode-neovim.neovimExecutablePaths.win32": "{{ nvim_exe }}",
         "workbench.colorCustomizations": {
             "titleBar.activeBackground":   "#8dc3ec77",
