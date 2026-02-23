@@ -10,24 +10,6 @@
     vscode_settings_json: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
   block:
 
-    - name: If the settings file is empty, add '{}'
-      block:
-        - name: Acquire the file status
-          stat:
-            path: "{{ vscode_settings_json }}"
-          register: json_status
-
-        - name: Initialize settings.json with '{}' if the file is missing or empty
-          ansible.builtin.copy:
-            dest: "{{ vscode_settings_json }}"
-            content: "{}"
-          when: not json_status.stat.exists or json_status.stat.size|int == 0
-
-
-    - name: Read VSCode settings
-      set_fact:
-        jsondata: "{{ lookup('file', vscode_settings_json) | from_json}}"
-
     - name: VSCode settings to be added
       set_fact:
         vscode: {
@@ -110,6 +92,25 @@
             "workbench.colorTheme": "Default Light+",
             "workbench.startupEditor": "none"
         }
+
+    - name: If the settings file is empty, add '{}'
+      block:
+        - name: Acquire the file status
+          stat:
+            path: "{{ vscode_settings_json }}"
+          register: json_status
+
+        - name: Initialize settings.json with '{}' if the file is missing or empty
+          ansible.builtin.copy:
+            dest: "{{ vscode_settings_json }}"
+            content: "{}"
+          when: not json_status.stat.exists or json_status.stat.size|int == 0
+
+
+    - name: Read VSCode settings
+      set_fact:
+        jsondata: "{{ lookup('file', vscode_settings_json) | from_json}}"
+
     - name: Insert our VSCode settings
       set_fact:
         merged: "{{ vscode | combine (jsondata) }}"
