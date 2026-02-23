@@ -8,90 +8,88 @@
   tags: json
   vars:
     vscode_settings_json: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
-  block:
+    vscode: { # VSCode settings to be added
+        "dev.containers.executeInWSL": true,
+        "editor.minimap.enabled": false,
+        "editor.wordWrap": "on",
+        "extensions.experimental.affinity": {
+            "asvetliakov.vscode-neovim": 1
+        },
+        "github.copilot.enable": {
+            "*": false,
+            "markdown": false,
+            "plaintext": false,
+            "scminput": false,
+            "yaml": false
+        },
+        "github.copilot.nextEditSuggestions.enabled": false,
+        "python.analysis.typeCheckingMode": "standard",
+        "redhat.telemetry.enabled": false,
+        "remote.autoForwardPortsSource": "hybrid",
+        "security.allowedUNCHosts": [
+            "wsl.localhost"
+        ],
+        "terminal.integrated.enableMultiLinePasteWarning": "never",
+        "vscode-neovim.ctrlKeysForInsertMode": [
+            "a",
+            "d",
+            "j",
+            "m",
+            "o",
+            "r",
+            "t",
+            "u",
+            "w",
+            "h",
+            "x",
+            "f",
+            "n",
+            "p"
+        ],
+        "vscode-neovim.ctrlKeysForNormalMode": [
+            "a",
+            "b",
+            "d",
+            "e",
+            "f",
+            "h",
+            "i",
+            "j",
+            "k",
+            "l",
+            "m",
+            "o",
+            "r",
+            "t",
+            "u",
+            "w",
+            "x",
+            "y",
+            "z",
+            "/",
+            "]",
+            "right",
+            "left",
+            "up",
+            "down",
+            "backspace",
+            "delete",
+            "v"
+        ],
+        "vscode-neovim.neovimExecutablePaths.darwin": "",
+        "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
+        "vscode-neovim.neovimExecutablePaths.win32": "{{ nvim_exe }}",
+        "workbench.colorCustomizations": {
+            "titleBar.activeBackground":   "#8dc3ec77",
+            "titleBar.activeForeground":   "#000000",
+            "titleBar.inactiveBackground": "#8dc3ec10",
+            "titleBar.inactiveForeground": "#00000020",
+        },
+        "workbench.colorTheme": "Default Light+",
+        "workbench.startupEditor": "none"
+    }
 
-    - name: VSCode settings to be added
-      set_fact:
-        vscode: {
-            "dev.containers.executeInWSL": true,
-            "editor.minimap.enabled": false,
-            "editor.wordWrap": "on",
-            "extensions.experimental.affinity": {
-                "asvetliakov.vscode-neovim": 1
-            },
-            "github.copilot.enable": {
-                "*": false,
-                "markdown": false,
-                "plaintext": false,
-                "scminput": false,
-                "yaml": false
-            },
-            "github.copilot.nextEditSuggestions.enabled": false,
-            "python.analysis.typeCheckingMode": "standard",
-            "redhat.telemetry.enabled": false,
-            "remote.autoForwardPortsSource": "hybrid",
-            "security.allowedUNCHosts": [
-                "wsl.localhost"
-            ],
-            "terminal.integrated.enableMultiLinePasteWarning": "never",
-            "vscode-neovim.ctrlKeysForInsertMode": [
-                "a",
-                "d",
-                "j",
-                "m",
-                "o",
-                "r",
-                "t",
-                "u",
-                "w",
-                "h",
-                "x",
-                "f",
-                "n",
-                "p"
-            ],
-            "vscode-neovim.ctrlKeysForNormalMode": [
-                "a",
-                "b",
-                "d",
-                "e",
-                "f",
-                "h",
-                "i",
-                "j",
-                "k",
-                "l",
-                "m",
-                "o",
-                "r",
-                "t",
-                "u",
-                "w",
-                "x",
-                "y",
-                "z",
-                "/",
-                "]",
-                "right",
-                "left",
-                "up",
-                "down",
-                "backspace",
-                "delete",
-                "v"
-            ],
-            "vscode-neovim.neovimExecutablePaths.darwin": "",
-            "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
-            "vscode-neovim.neovimExecutablePaths.win32": "{{ nvim_exe }}",
-            "workbench.colorCustomizations": {
-                "titleBar.activeBackground":   "#8dc3ec77",
-                "titleBar.activeForeground":   "#000000",
-                "titleBar.inactiveBackground": "#8dc3ec10",
-                "titleBar.inactiveForeground": "#00000020",
-            },
-            "workbench.colorTheme": "Default Light+",
-            "workbench.startupEditor": "none"
-        }
+  block:
 
     - name: If the settings file is empty, add '{}'
       block:
