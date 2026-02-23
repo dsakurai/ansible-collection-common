@@ -9,6 +9,7 @@
   vars:
     settings_json:
       path: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
+      empty: "{}"
       content: { # VSCode settings to be added
         "dev.containers.executeInWSL": true,
         "editor.minimap.enabled": false,
@@ -102,7 +103,7 @@
         - name: Initialize settings.json with '{}' if the file is missing or empty
           ansible.builtin.copy:
             dest: "{{ settings_json.path }}"
-            content: "{}"
+            content: "{{ settings_json.empty }}"
           when: not json_status.stat.exists or json_status.stat.size|int == 0
 
 
