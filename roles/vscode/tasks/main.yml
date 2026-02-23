@@ -2,25 +2,31 @@
 - name: VSCode settings
   tags: json
   vars:
-    settings_json: '/mnt/c/Users/Daisuke Sakurai/AppData/Roaming/Code/User/settings.json'
+    nvim_exe: "C:\\Users\\Daisuke Sakurai\\scoop\\shims\\nvim.exe"
   block:
+
+    - name: Check variable
+      when: vscode_settings_json is not defined
+      fail:
+        msg: "Set vscode_settings_json variable to invoke this role."
+
     - name: If the settings file is empty, add '{}'
       block:
         - name: Acquire the file status
           stat:
-            path: "{{ settings_json }}"
+            path: "{{ vscode_settings_json }}"
           register: json_status
 
         - name: Initialize settings.json with '{}' if the file is missing or empty
           ansible.builtin.copy:
-            dest: "{{ settings_json }}"
+            dest: "{{ vscode_settings_json }}"
             content: "{}"
           when: not json_status.stat.exists or json_status.stat.size|int == 0
 
 
     - name: Read VSCode settings
       set_fact:
-        jsondata: "{{ lookup('file', settings_json) | from_json}}"
+        jsondata: "{{ lookup('file', vscode_settings_json) | from_json}}"
 
     - name: VSCode settings to be added
       set_fact:
@@ -94,7 +100,7 @@
             ],
             "vscode-neovim.neovimExecutablePaths.darwin": "",
             "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
-            "vscode-neovim.neovimExecutablePaths.win32": "C:\\Users\\Daisuke Sakurai\\scoop\\shims\\nvim.exe",
+            "vscode-neovim.neovimExecutablePaths.win32": "{{ nvim_exe }}",
             "workbench.colorCustomizations": {
                 "titleBar.activeBackground":   "#8dc3ec77",
                 "titleBar.activeForeground":   "#000000",
@@ -111,5 +117,5 @@
     - name: Write our settings to settings.json
       ansible.builtin.copy:
         content: "{{ merged | to_nice_json }}"
-        dest: "{{ settings_json }}"
+        dest: "{{ vscode_settings_json }}"
         backup: true
