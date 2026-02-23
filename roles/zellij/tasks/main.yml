@@ -30,7 +30,7 @@
                   bind "Ctrl a" { SwitchToMode "Normal"; }
               }
           }
-          theme "catppuccin-latte"
+          theme "iceberg-light"
           show_startup_tips false
         dest: "~/.config/zellij/config.kdl"
         backup: true
