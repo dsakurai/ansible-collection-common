@@ -1,31 +1,37 @@
 ---
-# - name: Check variable
-#   when: json_file is not defined
-#   fail:
-#     msg: "Set json_file variable to invoke this role."
-
+- name: Check variable
+  when: json_file is not defined
+  fail:
+    msg: "Set the json_file dictionary for the json file that will be updated."
 
 - name: Initialize JSON file if missing or empty (with, e.g., like "{}")
   block:
     - name: Acquire the file status
       stat:
-        path: "{{ settings_json.path }}"
+        path: "{{ json_file.path }}"
       register: json_status
 
     - name: Initialize settings.json with '{}' if the file is missing or empty
       ansible.builtin.copy:
-        dest: "{{ settings_json.path }}"
-        content: "{{ settings_json.empty }}"
+        dest: "{{ json_file.path }}"
+        content: "{}"
       when: not json_status.stat.exists or json_status.stat.size|int == 0
 
 
 - name: Read existing json file
   set_fact:
-    jsondata: "{{ lookup('file', settings_json.path) | from_json}}"
+    jsondata: "{{ lookup('file', json_file.path) | regex_replace('//[^\n]*', '') | from_json}}"
 
 - name: Merge new content
-  set_fact:
-    merged: "{{ settings_json.content | combine (jsondata) }}"
+  block:
+    - name: Merge dictionaries
+      when: json_file.content is mapping
+      set_fact:
+        merged: "{{ json_file.content | combine (jsondata) }}"
+    - name: Replace value
+      when: json_file.content is not mapping
+      set_fact:
+        merged: "{{ json_file.content }}"
 
 - name: Show BEFORE / AFTER of the json file
   block:
@@ -67,5 +73,5 @@
 - name: Update the json file
   ansible.builtin.copy:
     content: "{{ merged | to_nice_json }}"
-    dest: "{{ settings_json.path }}"
+    dest: "{{ json_file.path }}"
     backup: true

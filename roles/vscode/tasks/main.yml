@@ -9,7 +9,6 @@
   vars:
     keybindings_json:
       path: "{{ [vscode_settings_dir, 'keybindings.json'] | path_join }}"
-      empty: "[]"
       content: [
           {
               "key": "ctrl+shift+c",
@@ -46,7 +45,6 @@
 
     settings_json:
       path: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
-      empty: "{}"
       content: { # VSCode settings to be added
         "dev.containers.executeInWSL": true,
         "editor.minimap.enabled": false,
@@ -133,5 +131,11 @@
     - name: Update settings.json
       ansible.builtin.include_role:
         name: dsakurai.common.update_json
-      # vars:
-      #   json_file: "{{ settings_json }}"
+      vars:
+        json_file: "{{ settings_json }}"
+
+    - name: Update keybindings.json
+      ansible.builtin.include_role:
+        name: dsakurai.common.update_json
+      vars:
+        json_file: "{{ keybindings_json }}"
