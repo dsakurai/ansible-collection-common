@@ -20,14 +20,14 @@
 
 - name: Read existing json file
   set_fact:
-    jsondata: "{{ lookup('file', json_file.path) | regex_replace('//[^\n]*', '') | from_json}}"
+    jsondata: "{{ lookup('file', json_file.path) | regex_replace('(?m)^\\s*//.*$', '') | regex_replace(',\\s*}', '}') | regex_replace(',\\s*]', ']') | from_json }}"
 
 - name: Merge new content
   block:
     - name: Merge dictionaries
       when: json_file.content is mapping
       set_fact:
-        merged: "{{ json_file.content | combine (jsondata) }}"
+        merged: "{{ jsondata | combine (json_file.content) }}"
     - name: Replace value
       when: json_file.content is not mapping
       set_fact:
