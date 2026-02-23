@@ -11,6 +11,31 @@
           - libssl-dev
           - perl             # For vendoring OpenSSL
 
+    - name: Ensure zellij config directory exists
+      ansible.builtin.file:
+        path: "~/.config/zellij"
+        state: directory
+
+    - name: Settings
+      ansible.builtin.copy:
+        content: |
+          // This file is managed by Ansible.
+          // If you'd like to override the default keybindings completely, be sure to change "keybinds" to "keybinds clear-defaults=true"
+          keybinds {
+              unbind "Ctrl o" // Used for vim
+              normal {
+                  bind "Ctrl a" { SwitchToMode "Session"; }
+              }
+              session {
+                  bind "Ctrl a" { SwitchToMode "Normal"; }
+              }
+          }
+          theme "catppuccin-latte"
+          show_startup_tips false
+        dest: "~/.config/zellij/config.kdl"
+        backup: true
+        force: true
+
     - name: Install latest Zellij
       community.general.cargo:
         name: zellij
@@ -18,9 +43,3 @@
         executable: "{{ cargo_binary }}"
       environment:
         OPENSSL_NO_VENDOR: "1" # force link to system libssl
-
-    - name: Apply theme
-      ansible.builtin.lineinfile:
-        path: "~/.config/zellij/config.kdl"
-        line: theme "catppuccin-latte"
-        create: true
