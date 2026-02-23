@@ -93,7 +93,7 @@
 
   block:
 
-    - name: If the settings file is empty, add '{}'
+    - name: If the settings file is empty, add some empty object (like "{}")
       block:
         - name: Acquire the file status
           stat:
