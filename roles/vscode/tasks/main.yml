@@ -8,7 +8,7 @@
   tags: json
   vars:
     vscode_settings_json: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
-    vscode: { # VSCode settings to be added
+    vscode_settings_content: { # VSCode settings to be added
         "dev.containers.executeInWSL": true,
         "editor.minimap.enabled": false,
         "editor.wordWrap": "on",
@@ -111,7 +111,7 @@
 
     - name: Insert our VSCode settings
       set_fact:
-        merged: "{{ vscode | combine (jsondata) }}"
+        merged: "{{ vscode_settings_content | combine (jsondata) }}"
 
     - name: Show BEFORE / AFTER of settings
       block:
