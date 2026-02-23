@@ -7,8 +7,9 @@
 - name: VSCode settings
   tags: json
   vars:
-    vscode_settings_json: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
-    vscode_settings_content: { # VSCode settings to be added
+    settings_json:
+      path: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
+      content: { # VSCode settings to be added
         "dev.containers.executeInWSL": true,
         "editor.minimap.enabled": false,
         "editor.wordWrap": "on",
@@ -95,23 +96,23 @@
       block:
         - name: Acquire the file status
           stat:
-            path: "{{ vscode_settings_json }}"
+            path: "{{ settings_json.path }}"
           register: json_status
 
         - name: Initialize settings.json with '{}' if the file is missing or empty
           ansible.builtin.copy:
-            dest: "{{ vscode_settings_json }}"
+            dest: "{{ settings_json.path }}"
             content: "{}"
           when: not json_status.stat.exists or json_status.stat.size|int == 0
 
 
     - name: Read VSCode settings
       set_fact:
-        jsondata: "{{ lookup('file', vscode_settings_json) | from_json}}"
+        jsondata: "{{ lookup('file', settings_json.path) | from_json}}"
 
     - name: Insert our VSCode settings
       set_fact:
-        merged: "{{ vscode_settings_content | combine (jsondata) }}"
+        merged: "{{ settings_json.content | combine (jsondata) }}"
 
     - name: Show BEFORE / AFTER of settings
       block:
@@ -153,5 +154,5 @@
     - name: Write our settings to settings.json
       ansible.builtin.copy:
         content: "{{ merged | to_nice_json }}"
-        dest: "{{ vscode_settings_json }}"
+        dest: "{{ settings_json.path }}"
         backup: true
