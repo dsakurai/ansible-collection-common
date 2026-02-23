@@ -1,12 +1,14 @@
 ---
+- name: Check variable
+  when: vscode_settings_dir is not defined
+  fail:
+    msg: "Set vscode_settings_dir variable to invoke this role."
+
 - name: VSCode settings
   tags: json
+  vars:
+    vscode_settings_json: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
   block:
-
-    - name: Check variable
-      when: vscode_settings_json is not defined
-      fail:
-        msg: "Set vscode_settings_json variable to invoke this role."
 
     - name: If the settings file is empty, add '{}'
       block:
