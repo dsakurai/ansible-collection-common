@@ -7,6 +7,43 @@
 - name: VSCode settings
   tags: json
   vars:
+    keybindings_json:
+      path: "{{ [vscode_settings_dir, 'keybindings.json'] | path_join }}"
+      empty: "[]"
+      content: [
+          {
+              "key": "ctrl+shift+c",
+              "command": "-workbench.action.terminal.openNativeConsole",
+              "when": "!terminalFocus"
+          },
+          {
+              "key": "ctrl+shift+c",
+              "command": "editor.action.clipboardCopyAction"
+          },
+          {
+              "key": "ctrl+c",
+              "command": "-editor.action.clipboardCopyAction"
+          },
+          {
+              "key": "ctrl+shift+v",
+              "command": "editor.action.clipboardPasteAction"
+          },
+          {
+              "key": "ctrl+v",
+              "command": "-editor.action.clipboardPasteAction"
+          },
+          {
+              "key": "ctrl+shift+i",
+              "command": "inlineChat.start",
+              "when": "editorFocus && inlineChatHasEditsAgent && inlineChatPossible && !editorReadonly && !editorSimpleInput && activeEditor != 'workbench.editor.notebook' || editorFocus && inlineChatHasNotebookAgent && inlineChatPossible && !editorReadonly && !editorSimpleInput && activeEditor == 'workbench.editor.notebook' || editorFocus && inlineChatHasNotebookInline && inlineChatPossible && !editorReadonly && !editorSimpleInput && activeEditor == 'workbench.editor.notebook' || editorFocus && inlineChatHasProvider && inlineChatPossible && !editorReadonly && !editorSimpleInput && activeEditor != 'workbench.editor.notebook'"
+          },
+          {
+              "key": "ctrl+i",
+              "command": "-inlineChat.start",
+              "when": "editorFocus && inlineChatHasEditsAgent && inlineChatPossible && !editorReadonly && !editorSimpleInput && activeEditor != 'workbench.editor.notebook' || editorFocus && inlineChatHasNotebookAgent && inlineChatPossible && !editorReadonly && !editorSimpleInput && activeEditor == 'workbench.editor.notebook' || editorFocus && inlineChatHasNotebookInline && inlineChatPossible && !editorReadonly && !editorSimpleInput && activeEditor == 'workbench.editor.notebook' || editorFocus && inlineChatHasProvider && inlineChatPossible && !editorReadonly && !editorSimpleInput && activeEditor != 'workbench.editor.notebook'"
+          }
+      ]
+
     settings_json:
       path: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
       empty: "{}"
