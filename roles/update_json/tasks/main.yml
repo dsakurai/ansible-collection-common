@@ -1,0 +1,71 @@
+---
+# - name: Check variable
+#   when: json_file is not defined
+#   fail:
+#     msg: "Set json_file variable to invoke this role."
+
+
+- name: Initialize JSON file if missing or empty (with, e.g., like "{}")
+  block:
+    - name: Acquire the file status
+      stat:
+        path: "{{ settings_json.path }}"
+      register: json_status
+
+    - name: Initialize settings.json with '{}' if the file is missing or empty
+      ansible.builtin.copy:
+        dest: "{{ settings_json.path }}"
+        content: "{{ settings_json.empty }}"
+      when: not json_status.stat.exists or json_status.stat.size|int == 0
+
+
+- name: Read existing json file
+  set_fact:
+    jsondata: "{{ lookup('file', settings_json.path) | from_json}}"
+
+- name: Merge new content
+  set_fact:
+    merged: "{{ settings_json.content | combine (jsondata) }}"
+
+- name: Show BEFORE / AFTER of the json file
+  block:
+  - name: Create temp file for current json
+    ansible.builtin.tempfile:
+      state: file
+      suffix: .old.json
+    register: current_settings_tmp
+
+  - name: Create temp file for merged json
+    ansible.builtin.tempfile:
+      state: file
+      suffix: .new.json
+    register: merged_settings_tmp
+
+  - name: Write normalized current json to temp file
+    ansible.builtin.copy:
+      dest: "{{ current_settings_tmp.path }}"
+      content: "{{ jsondata | to_nice_json }}"
+
+  - name: Write normalized merged json to temp file
+    ansible.builtin.copy:
+      dest: "{{ merged_settings_tmp.path }}"
+      content: "{{ merged | to_nice_json }}"
+
+  - name: Compare current and merged json
+    ansible.builtin.command:
+      cmd: "diff -U0 {{ current_settings_tmp.path }} {{ merged_settings_tmp.path }}"
+    register: vscode_settings_diff
+    changed_when: false
+    failed_when: vscode_settings_diff.rc not in [0, 1]
+
+  - name: Show diff
+    when: vscode_settings_diff.rc == 1
+    ansible.builtin.debug:
+      msg: |
+        {{ vscode_settings_diff.stdout.splitlines() }}
+
+- name: Update the json file
+  ansible.builtin.copy:
+    content: "{{ merged | to_nice_json }}"
+    dest: "{{ settings_json.path }}"
+    backup: true

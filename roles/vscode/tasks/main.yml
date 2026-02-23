@@ -130,67 +130,8 @@
 
   block:
 
-    - name: If the settings file is empty, add some empty object (like "{}")
-      block:
-        - name: Acquire the file status
-          stat:
-            path: "{{ settings_json.path }}"
-          register: json_status
-
-        - name: Initialize settings.json with '{}' if the file is missing or empty
-          ansible.builtin.copy:
-            dest: "{{ settings_json.path }}"
-            content: "{{ settings_json.empty }}"
-          when: not json_status.stat.exists or json_status.stat.size|int == 0
-
-
-    - name: Read VSCode settings
-      set_fact:
-        jsondata: "{{ lookup('file', settings_json.path) | from_json}}"
-
-    - name: Insert our VSCode settings
-      set_fact:
-        merged: "{{ settings_json.content | combine (jsondata) }}"
-
-    - name: Show BEFORE / AFTER of settings
-      block:
-      - name: Create temp file for current settings
-        ansible.builtin.tempfile:
-          state: file
-          suffix: .old.json
-        register: current_settings_tmp
-
-      - name: Create temp file for merged settings
-        ansible.builtin.tempfile:
-          state: file
-          suffix: .new.json
-        register: merged_settings_tmp
-
-      - name: Write normalized current settings to temp file
-        ansible.builtin.copy:
-          dest: "{{ current_settings_tmp.path }}"
-          content: "{{ jsondata | to_nice_json }}"
-
-      - name: Write normalized merged settings to temp file
-        ansible.builtin.copy:
-          dest: "{{ merged_settings_tmp.path }}"
-          content: "{{ merged | to_nice_json }}"
-
-      - name: Compare current and merged settings
-        ansible.builtin.command:
-          cmd: "diff -U0 {{ current_settings_tmp.path }} {{ merged_settings_tmp.path }}"
-        register: vscode_settings_diff
-        changed_when: false
-        failed_when: vscode_settings_diff.rc not in [0, 1]
-
-      - name: Show settings diff
-        when: vscode_settings_diff.rc == 1
-        ansible.builtin.debug:
-          msg: |
-            {{ vscode_settings_diff.stdout.splitlines() }}
-
-    - name: Write our settings to settings.json
-      ansible.builtin.copy:
-        content: "{{ merged | to_nice_json }}"
-        dest: "{{ settings_json.path }}"
-        backup: true
+    - name: Update settings.json
+      ansible.builtin.include_role:
+        name: dsakurai.common.update_json
+      # vars:
+      #   json_file: "{{ settings_json }}"
