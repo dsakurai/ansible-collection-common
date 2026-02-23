@@ -1,8 +1,6 @@
 ---
 - name: VSCode settings
   tags: json
-  vars:
-    nvim_exe: "C:\\Users\\Daisuke Sakurai\\scoop\\shims\\nvim.exe"
   block:
 
     - name: Check variable
