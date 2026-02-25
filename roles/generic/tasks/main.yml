@@ -44,7 +44,7 @@
       git_config:
         scope: global
         name: alias.log-graph
-        value: log --graph
+        value: log --graph --all
 
 
 - name: Cycle bash completion with TAB
