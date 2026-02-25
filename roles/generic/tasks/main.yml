@@ -28,24 +28,6 @@
           vim.keymap.set("n", "<S-Tab>", "<<")
           vim.keymap.set("v", "<S-Tab>", "<gv")
 
-- name: git
-  block:
-    ###
-    # git should be already installed for DL-ing this Ansible project.
-    # In fact, installing OS git might conflict with git from VSCode, etc.
-    #
-    # - name: install git
-    #   apt:
-    #     name: git
-    #   become: true
-    - name: git set up
-      shell: git config --global init.defaultBranch main
-    - name: git alias
-      git_config:
-        scope: global
-        name: alias.log-graph
-        value: log --graph --all
-
 
 - name: Cycle bash completion with TAB
   blockinfile:
