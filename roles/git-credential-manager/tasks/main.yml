@@ -1,0 +1,83 @@
+---
+- name: Git Credential Manager
+  block:
+
+    - name: Check that git is available
+      ansible.builtin.command:
+        cmd: git --version
+      changed_when: false
+      register: git_check
+      failed_when: git_check.rc != 0
+
+    - name: gpg
+      block:
+        - name: Install gpg, pass and pinentry (the last one without curses)
+          become: true
+          apt:
+            name:
+              - gpg
+              - pass
+              - pinentry-tty
+            state: present
+        
+        - name: ensure gpg directory
+          file:
+            path: ~/.gnupg
+            state: directory
+            mode: '0700'
+        - name: Set pinentry for gpg
+          lineinfile:
+            path: ~/.gnupg/gpg-agent.conf
+            line: 'pinentry-program /usr/bin/pinentry-tty'
+            create: true
+
+        - name: Ensure GPG_TTY is set for TTY/headless sessions
+          ansible.builtin.lineinfile:
+            path: ~/.bashrc
+            line: 'export GPG_TTY=$(tty)'
+            create: true
+
+    - name: Install .NET SDK
+      become: true
+      apt:
+        name: dotnet-sdk-10.0 # 8.0 used to be fine. Updating to the newer one.
+        # Ubuntu also installs the ASP.Net Core runtime
+        state: present
+        update_cache: false
+
+    - name: Add .Net tools in PATH
+      ansible.builtin.lineinfile:
+        path: ~/.bashrc
+        line: 'export PATH="$HOME/.dotnet/tools:$PATH"'
+        create: true
+
+    - name: Install GCM via dotnet tool
+      ansible.builtin.command:
+        cmd: dotnet tool install -g git-credential-manager
+      register: gcm_install
+      changed_when: "'already installed' not in gcm_install.stdout | lower and 'already installed' not in gcm_install.stderr | lower"
+      failed_when: gcm_install.rc != 0 and 'already installed' not in gcm_install.stderr | lower
+
+    - name: Update GCM
+      ansible.builtin.command:
+        cmd: dotnet tool update -g git-credential-manager
+
+    - name: Use GCM as the git credential helper
+      ansible.builtin.git_config:
+        name: credential.helper
+        value: manager
+        scope: global
+
+    - name: Set credential store to gpg
+      ansible.builtin.git_config:
+        name: credential.credentialStore
+        value: gpg
+        scope: global
+
+    - name: Manual steps reminder
+      ansible.builtin.debug:
+        msg: |
+          If you have not yet initialized a GPG key and pass store, run the following manually:
+            gpg --gen-key
+            pass init <gpg-id>
+          (where <gpg-id> is the email or key ID from gpg --list-keys)
