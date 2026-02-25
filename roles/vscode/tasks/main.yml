@@ -137,6 +137,29 @@
             "titleBar.inactiveForeground": "#00000020",
         },
         "workbench.colorTheme": "Default Light+",
+        "workbench.settings.applyToAllProfiles": [
+            "dotfiles.repository"
+        ],
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+            "bash": {
+                "path": "/usr/bin/bash"
+            },
+            "fish": {
+                "path": "fish",
+            },
+            "pwsh": {
+                "icon": "terminal-powershell",
+                "path": "pwsh",
+            },
+            "tmux": {
+                "icon": "terminal-tmux",
+                "path": "tmux",
+            },
+            "zsh": {
+                "path": "zsh"
+            }
+        },
         "workbench.startupEditor": "none"
       }
 
