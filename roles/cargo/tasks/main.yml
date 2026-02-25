@@ -4,6 +4,12 @@
   vars:
     rustup_bin: "~/.cargo/bin/rustup"
   block:
+    - name: Install curl
+      apt:
+        name: curl
+        state: present
+      become: yes
+
     - name: Ensure rustup
       shell: |
         if [ ! -x "{{ rustup_bin }}" ]; then
