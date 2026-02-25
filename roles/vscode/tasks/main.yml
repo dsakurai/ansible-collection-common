@@ -47,6 +47,8 @@
       path: "{{ [vscode_settings_dir, 'settings.json'] | path_join }}"
       content: { # VSCode settings to be added
         "dev.containers.executeInWSL": true,
+        "dotfiles.targetPath": "/tmp/dotfiles",
+        "dotfiles.repository": "git@github.com:dsakurai/ansible-dotfiles.git",
         "editor.minimap.enabled": false,
         "editor.wordWrap": "on",
         "extensions.experimental.affinity": {
