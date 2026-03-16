@@ -120,10 +120,17 @@
         ],
         "editor.autoIndentOnPaste": true,
         "editor.autoIndentOnPasteWithinString": false,
+        "editor.cursorSmoothCaretAnimation": "on",
         "terminal.integrated.commandsToSkipShell": [
           "-workbench.action.quickOpen"
         ],
+        "terminal.integrated.rightClickBehavior": "default",        # Context menu
         "terminal.integrated.stickyScroll.enabled": false,
+        "terminal.integrated.sendKeybindingsToShell": true,
+        "terminal.integrated.scrollback": 1000000,                  # Number of lines in the terminal scrollback
+        "terminal.integrated.persistentSessionScrollback": 1000000, # Retain this many scrollback after restart
+        "terminal.integrated.suggest.enabled": false,               # Annoying most of the time
+        "terminal.integrated.suggest.inlineSuggestion": "off",
         "[latex]": {
             "editor.wordBasedSuggestions": "off",
             "editor.snippetSuggestions": "none",
