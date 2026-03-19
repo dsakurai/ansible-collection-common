@@ -66,6 +66,8 @@
       command:
         cmd: ranger --copy-config=rifle
         creates: "~/.config/ranger/rifle.conf"
+      environment:
+        TERM: dumb # tell curses to use the minimal terminal definition, which is always available and doesn't require a full terminfo entry. This lets ranger --copy-config=rifle complete successfully without a real TTY.Adding environment: TERM: dumb tells curses to use the minimal "dumb" terminal definition, which is always available and doesn't require a full terminfo entry. This lets ranger --copy-config=rifle complete successfully without a real TTY.
 
     - name: open yml / yaml in nvim
       tags: ranger
