@@ -23,10 +23,28 @@
         create: true
         marker: -- {mark} Managed by Ansible --
         content: |
+          -- Locale settings
+          vim.cmd('language en_US.UTF-8')
+
           -- Press Shift+Tab to deindent
           vim.keymap.set("i", "<S-Tab>", "<C-d>")
           vim.keymap.set("n", "<S-Tab>", "<<")
           vim.keymap.set("v", "<S-Tab>", "<gv")
+
+          vim.opt.expandtab = true -- Insert spaces instead of tabs
+          vim.opt.shiftwidth = 2 -- Indentation size
+
+          -- Backspace deletes one space only, not the whole indent
+          vim.opt.smarttab = false
+          vim.opt.softtabstop = 1
+
+          -- Python overrides the style...
+          vim.api.nvim_create_autocmd("FileType", {
+            pattern = "python",
+            callback = function()
+              vim.bo.softtabstop = 1
+            end,
+          })
 
 
 - name: Cycle bash completion with TAB

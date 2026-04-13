@@ -1,0 +1,100 @@
+---
+- name: Set up editor
+  block:
+    - name: Add plugins
+      tags: neovim
+      blockinfile:
+        dest: "{{ lookup('env','HOME') }}/.config/nvim/init.lua"
+        create: true
+        marker: -- {mark} Plugins managed by Ansible --
+        content: |
+          -- Remember fold states
+          local remember_folds_group = vim.api.nvim_create_augroup("remember_folds", { clear = true })
+          --
+          local function should_do_view(buf)
+            if vim.bo[buf].buftype ~= "" then return false end     -- nohelp, noquickfix, etc.
+            if vim.bo[buf].filetype == "" then return false end    -- optional
+            local name = vim.api.nvim_buf_get_name(buf)
+            if name == nil or name == "" then return false end     -- no [No Name]
+            if vim.fn.filereadable(name) == 0 then return false end -- not a real file
+            return true
+          end
+
+          -- Save state
+          vim.api.nvim_create_autocmd({ "BufWinLeave", "BufWritePost", "BufHidden", "QuitPre" }, {
+            group = remember_folds_group,
+            callback = function(args)
+              if should_do_view(args.buf) then
+                pcall(vim.cmd, "silent! mkview!")
+              end
+            end
+          })
+
+          -- Load state
+          vim.api.nvim_create_autocmd("BufWinEnter", {
+            group = augroup,
+            callback = function(args)
+              if should_do_view(args.buf) then
+                pcall(vim.cmd, "silent! loadview")
+              end
+            end
+          })
+
+          -- Bootstrap lazy.nvim
+          local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+          if not (vim.uv or vim.loop).fs_stat(lazypath) then
+            local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+            local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=v11.17.5", lazyrepo, lazypath })
+            if vim.v.shell_error ~= 0 then
+              vim.api.nvim_echo({
+                { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+                { out, "WarningMsg" },
+                { "\nPress any key to exit..." },
+              }, true, {})
+              vim.fn.getchar()
+              os.exit(1)
+            end
+          end
+          vim.opt.rtp:prepend(lazypath)
+
+          -- Make sure to setup `mapleader` and `maplocalleader` before
+          -- loading lazy.nvim so that mappings are correct.
+          -- This is also a good place to setup other settings (vim.opt)
+          vim.g.mapleader = " "
+          vim.g.maplocalleader = "\\"
+
+          -- Conceal doesn't work with line wrapping
+          vim.opt.conceallevel = 0
+
+          -- Setup lazy.nvim
+          require("lazy").setup({
+            spec = {
+              -- add your plugins here
+
+              -- I don't think we need this for nvim-orgmode to function.
+              {"nvim-treesitter/nvim-treesitter",
+                  version = "v0.10.0",
+                  lazy = false,
+                  build = ":TSUpdate",
+                  config = function()
+                      require'nvim-treesitter.configs'.setup({
+                        highlight = {
+                          enable = true,
+                        },
+                        ensure_installed = {
+                          "markdown",
+                          "markdown_inline",
+                        }
+                      })
+                  end,
+              },
+
+            },
+            -- Configure any other settings here. See the documentation for more details.
+            -- colorscheme that will be used when installing plugins.
+            -- install = { colorscheme = { "habamax" } },
+            -- automatically check for plugin updates
+            checker = { enabled = true },
+          })
+
+
