@@ -169,7 +169,8 @@
                 "path": "zsh"
             }
         },
-        "workbench.startupEditor": "none"
+        "workbench.startupEditor": "none",
+        "ansible.validation.lint.enabled": false,
       }
 
   block:
