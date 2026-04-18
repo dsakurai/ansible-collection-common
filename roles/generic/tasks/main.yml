@@ -1,21 +1,79 @@
 ---
 - name: Set up editor
   block:
-    - name: install neovim
-      apt:
-        name: neovim
+    - name: With sudo
       become: true
+      block:
+        - name: install neovim
+          apt:
+            name: neovim
 
-    - name: Set editor
-      shell: update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 100
-      become: true
+        - name: Set editor for Debian
+          shell: update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 100
 
-    - name: Set editor env var
-      become: true
-      copy:
-        content: |
-          export EDITOR="/usr/bin/nvim"
-        dest: /etc/profile.d/editor.sh
+        - name: Set editor env var
+          copy:
+            content: |
+              export EDITOR="/usr/bin/nvim"
+            dest: /etc/profile.d/editor.sh
+
+    - name: Without sudo
+      block:
+        - name: Ensure local cache dir exists
+          file:
+            path: "{{ lookup('env', 'HOME') }}/local/cache"
+            state: directory
+            mode: "0755"
+        - name: Ensure user bin dir exists
+          file:
+            path: "{{ lookup('env', 'HOME') }}/bin"
+            state: directory
+            mode: "0755"
+
+        - name: Ensure Neovim AppImage arch is supported
+          fail:
+            msg: "Neovim AppImage auto-install currently supports only x86_64/amd64; got {{ ansible_architecture }}"
+          when: ansible_architecture not in ["x86_64", "amd64"]
+
+        - name: Get latest Neovim release metadata
+          uri:
+            url: https://api.github.com/repos/neovim/neovim/releases/latest
+            return_content: true
+          register: neovim_release
+          changed_when: false
+
+        - name: Pick Linux x86_64 AppImage asset
+          set_fact:
+            neovim_appimage_url: "{{ neovim_release.json.assets | selectattr('name', 'search', 'nvim-linux-x86_64.appimage$') | map(attribute='browser_download_url') | first | default('') }}"
+            neovim_appimage_tag: "{{ neovim_release.json.tag_name }}"
+
+        - name: Fail if AppImage asset is unavailable
+          fail:
+            msg: "Could not find Linux x86_64 AppImage asset in latest Neovim release {{ neovim_release.json.tag_name }}"
+          when: neovim_appimage_url == ""
+
+        - name: Download latest Neovim AppImage
+          get_url:
+            url: "{{ neovim_appimage_url }}"
+            dest: "{{ lookup('env', 'HOME') }}/local/cache/nvim.appimage"
+            mode: "0755"
+
+        - name: Set nvim symlink to latest AppImage
+          file:
+            src: "{{ lookup('env', 'HOME') }}/local/cache/nvim.appimage"
+            dest: "{{ lookup('env', 'HOME') }}/bin/nvim"
+            state: link
+
+        - name: Set editor env var
+          blockinfile:
+            path: "{{ lookup('env', 'HOME') }}/.bashrc"
+            create: true
+            marker: "# {mark} Managed by Ansible (editor)"
+            block: |
+              # Ensure user's local bin is on PATH so nvim is discoverable
+              export PATH="$HOME/bin:$PATH"
+              export EDITOR="$HOME/bin/nvim"
+
     - name: Deploy init.lua for Neovim
       tags: neovim
       blockinfile:
