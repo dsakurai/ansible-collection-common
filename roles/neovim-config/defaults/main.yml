@@ -1,0 +1,5 @@
+---
+# Default variables for neovim-config role
+# Path to the Obsidian workspace used by obsidian.nvim plugin.
+# Users can override this in playbooks/inventory/host_vars.
+obsidian_workspace_private_path: "~/private/notes/obsidian/config/Obsidian Vault"

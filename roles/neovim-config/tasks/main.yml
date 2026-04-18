@@ -1,7 +1,23 @@
 ---
 - name: Set up editor
+  vars:
+    notes_subdir: "Notes"
+    templates_folder: "Support/Templates"
+
   block:
-    - name: Add plugins
+
+    - name: Ensure Obsidian workspace and subdirectories exist
+      tags: neovim
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ obsidian_workspace_private_path }}"
+        - "{{ obsidian_workspace_private_path + '/' + notes_subdir }}"
+        - "{{ obsidian_workspace_private_path + '/' + templates_folder }}"
+
+    - name: Add plugins (write init.lua)
       tags: neovim
       blockinfile:
         dest: "{{ lookup('env','HOME') }}/.config/nvim/init.lua"
@@ -32,7 +48,7 @@
 
           -- Load state
           vim.api.nvim_create_autocmd("BufWinEnter", {
-            group = augroup,
+            group = remember_folds_group,
             callback = function(args)
               if should_do_view(args.buf) then
                 pcall(vim.cmd, "silent! loadview")
@@ -71,6 +87,37 @@
             spec = {
               -- add your plugins here
 
+              -- obsidian
+              {
+                "obsidian-nvim/obsidian.nvim",
+                version = "v3.16.2",
+                ft = "markdown",
+                opts = {
+                  note_id_func = function(title)
+                    return title
+                  end,
+                  ui = {
+                    enable = false,
+                  },
+                  checkbox = {
+                    enabled = true,
+                    create_new = true,
+                    order = {" ", ">", "x"},
+                  },
+                  workspaces = {
+                    {
+                      name = "private",
+                      path = "{{ obsidian_workspace_private_path }}"
+                    },
+                  },
+                  new_notes_location = "notes_subdir",
+                  notes_subdir = "{{ notes_subdir }}",
+                  templates = {
+                    folder = "{{ templates_folder }}",
+                  }
+                },
+              },
+
               -- I don't think we need this for nvim-orgmode to function.
               {"nvim-treesitter/nvim-treesitter",
                   version = "v0.10.0",
@@ -96,5 +143,4 @@
             -- automatically check for plugin updates
             checker = { enabled = true },
           })
-
 
