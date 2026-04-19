@@ -51,6 +51,12 @@
               "command": "selectPrevSuggestion",
               "when": "editorTextFocus && suggestWidgetVisible"
           }
+          ,
+          {
+              "key": "tab",
+              "command": "editor.action.triggerSuggest",
+              "when": "editorTextFocus && !suggestWidgetVisible"
+          }
       ]
 
     settings_json:
