@@ -3,6 +3,11 @@
   when: vscode_settings_dir is not defined
   fail:
     msg: "Set vscode_settings_dir variable to invoke this role."
+- name: Create output directory
+  ansible.builtin.file:
+    path: "{{ vscode_settings_dir }}"
+    state: directory
+    mode: "0755"
 
 - name: VSCode settings
   tags: json
