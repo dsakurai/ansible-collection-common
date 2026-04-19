@@ -150,7 +150,7 @@
                     -- preset = 'default',
                     preset = 'enter',
 
-                    ['<Tab>'] = {'show'}
+                    ['<Tab>'] = {'show', "select_next", "fallback"}
                    },
                   
                   -- 
