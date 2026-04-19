@@ -141,7 +141,6 @@
             "delete",
             "v"
         ],
-        "vscode-neovim.useEditorCompletions": false,
         "editor.tabCompletion": "off",
         "editor.autoIndentOnPaste": true,
         "editor.autoIndentOnPasteWithinString": false,
