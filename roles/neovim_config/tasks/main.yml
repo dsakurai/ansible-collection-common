@@ -20,7 +20,7 @@
     - name: Add plugins (write init.lua)
       tags: neovim
       blockinfile:
-        dest: "{{ lookup('env','HOME') }}/.config/nvim/init.lua"
+        dest: "{{ nvim_config_dir }}/init.lua"
         create: true
         marker: -- {mark} Plugins managed by Ansible --
         content: |
