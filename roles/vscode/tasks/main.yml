@@ -55,13 +55,14 @@
               "key": "shift+tab",
               "command": "selectPrevSuggestion",
               "when": "editorTextFocus && suggestWidgetVisible"
-          }
-          ,
+          },
           {
               "key": "tab",
               "command": "editor.action.triggerSuggest",
-              "when": "editorTextFocus && !suggestWidgetVisible"
-          }
+              # The below make this trigger when the NES (Next Edit Suggestion, technically "Accept Inline Suggestion") is NOT triggered (scraped from the Keyboard Shortcuts of VSCode menu).
+              # It's cleaner if VSCode provides a context variable for the NES, but it seems there is none as of now. The "inlineSuggestionVisible" is true when the NES is visible, but it is also true when the regular inline suggestion is visible, so it cannot be used alone.
+              "when": "!(inlineEditIsVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible)"
+          },
       ]
 
     settings_json:
@@ -81,13 +82,13 @@
             "asvetliakov.vscode-neovim": 1
         },
         "github.copilot.enable": {
-            "*": false,
+            "*": true,
             "markdown": false,
             "plaintext": false,
             "scminput": false,
             "yaml": false
         },
-        "github.copilot.nextEditSuggestions.enabled": false,
+        "github.copilot.nextEditSuggestions.enabled": true,
         "python.analysis.typeCheckingMode": "standard",
         "redhat.telemetry.enabled": false,
         "remote.autoForwardPortsSource": "hybrid",
@@ -203,8 +204,17 @@
       vars:
         json_file: "{{ settings_json }}"
 
+    - name: Print path
+      ansible.builtin.debug:
+        msg: "{{ settings_json.path }}"
+
     - name: Update keybindings.json
       ansible.builtin.include_role:
         name: dsakurai.common.update_json
       vars:
         json_file: "{{ keybindings_json }}"
+
+    - name: Print path
+      ansible.builtin.debug:
+        msg: "{{ keybindings_json.path }}"
+
