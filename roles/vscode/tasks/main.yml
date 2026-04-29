@@ -144,6 +144,11 @@
             "v"
         ],
         "editor.tabCompletion": "off",
+        "editor.quickSuggestions": { # Disable automatic popup of completion as pulldown list, because it conflicts with the copilot's suggestions. The popup can still be triggered manually via keyboard shortcuts.
+            "comments": false, # in comments
+            "strings": false,  # in strings
+            "other": false,    # everywhere else
+        },
         "editor.autoIndentOnPaste": true,
         "editor.autoIndentOnPasteWithinString": false,
         "editor.cursorSmoothCaretAnimation": "on",
