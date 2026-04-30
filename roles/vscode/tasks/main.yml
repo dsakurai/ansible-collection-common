@@ -64,6 +64,11 @@
               "when": "!(inlineEditIsVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible) \
               && !suggestWidgetVisible" # The last condition is added to allow "selectNextSuggestion" command with tab.
           },
+          {
+              "key": "escape",
+              "command": "-notebook.cell.quitEdit",
+              # "when": "notebookEditorFocused && inputFocus && !notebookOutputFocused" # This is apparently the condition, but for simplicity we just never trigger the quitEdit command with escape.
+          }
       ]
 
     settings_json:
