@@ -57,17 +57,9 @@
               "when": "editorTextFocus && suggestWidgetVisible"
           },
           {
-              key: "tab",
-              "command": "editor.action.triggerSuggest",
-              # The below make this trigger when the NES (Next Edit Suggestion, technically "Accept Inline Suggestion") is NOT triggered (scraped from the Keyboard Shortcuts of VSCode menu).
-              # It's cleaner if VSCode provides a context variable for the NES, but it seems there is none as of now. The "inlineSuggestionVisible" is true when the NES is visible, but it is also true when the regular inline suggestion is visible, so it cannot be used alone.
-              "when": "!(inlineEditIsVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible) \
-              && !suggestWidgetVisible" # The last condition is added to allow "selectNextSuggestion" command with tab.
-          },
-          {
               "key": "escape",
               "command": "-notebook.cell.quitEdit",
-              # "when": "notebookEditorFocused && inputFocus && !notebookOutputFocused" # This is apparently the condition, but for simplicity we just never trigger the quitEdit command with escape.
+              # "when": "notebookEditorFocused && inputFocus && !notebookOutputFocused" # This is the condition according to ChatGPT, but for simplicity we just never trigger the quitEdit command with escape.
           }
       ]
 
